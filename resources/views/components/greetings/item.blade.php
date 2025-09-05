@@ -10,7 +10,7 @@
                     <span class="comment-meta"><time datetime="{{ $greeting->created_at }}" title="{{ $greeting->created_at }}">{{ $greeting->created_at->diffForHumans() }}</time></span>
                 </div>
                 @if($greeting->image_url)
-                    <div class="mb-2">
+                    <div class="mb- ">
                         <img src="{{ $greeting->image_url }}" alt="uploaded image" class="img-fluid rounded border" loading="lazy">
                     </div>
                 @endif
