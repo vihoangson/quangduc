@@ -72,6 +72,7 @@ import './bootstrap';
     document.addEventListener('DOMContentLoaded', () => {
         initAutoResize();
         highlightHash();
+        initGuestName();
     });
 
     // Highlight greeting if linked via hash
@@ -86,6 +87,87 @@ import './bootstrap';
     }
 
     window.addEventListener('hashchange', highlightHash);
+
+    // Guest name storage logic
+    function initGuestName(){
+        const KEY='guestName';
+        let cached = localStorage.getItem(KEY) || '';
+        const modalEl = document.getElementById('guestNameModal');
+        const inputEl = modalEl ? modalEl.querySelector('#guestNameInput') : null;
+        const changeBtn = document.getElementById('changeNameBtn');
+        const clearBtn = document.getElementById('clearSavedNameBtn');
+
+        function applyName(name){
+            document.querySelectorAll('input[name="name"]').forEach(inp => {
+                if (!inp.value || inp.dataset.autofilled === '1' || inp.value === cached) {
+                    inp.value = name;
+                    inp.dataset.autofilled = '1';
+                }
+            });
+            if (changeBtn) changeBtn.classList.remove('d-none');
+        }
+
+        function openModal(){
+            if (!modalEl) return;
+            const inst = window.bootstrap?.Modal.getOrCreateInstance(modalEl);
+            if (inputEl) {
+                inputEl.value = cached || '';
+                setTimeout(()=>inputEl.focus(),90);
+            }
+            inst?.show();
+        }
+
+        function saveName(name){
+            cached = name.trim();
+            if (!cached) return false;
+            localStorage.setItem(KEY, cached);
+            applyName(cached);
+            return true;
+        }
+
+        if (cached) applyName(cached);
+
+        // Focus interception
+        document.addEventListener('focusin', (e)=>{
+            if (e.target.matches('input[name="name"]')) {
+                if (!cached) {
+                    e.target.blur();
+                    openModal();
+                }
+            }
+        });
+
+        // Modal form submit
+        modalEl?.querySelector('form')?.addEventListener('submit',(e)=>{
+            e.preventDefault();
+            const val = inputEl?.value.trim() || '';
+            if (val.length === 0) {
+                inputEl?.classList.add('is-invalid');
+                return;
+            }
+            inputEl?.classList.remove('is-invalid');
+            if (saveName(val)) {
+                window.bootstrap?.Modal.getInstance(modalEl)?.hide();
+            }
+        });
+
+        changeBtn?.addEventListener('click',(e)=>{
+            e.preventDefault();
+            openModal();
+        });
+
+        clearBtn?.addEventListener('click',(e)=>{
+            e.preventDefault();
+            localStorage.removeItem(KEY);
+            cached='';
+            document.querySelectorAll('input[name="name"]').forEach(inp=>{
+                if (inp.dataset.autofilled==='1') { inp.value=''; }
+            });
+            openModal();
+        });
+        // Expose for debugging
+        window.__guestName = { set: saveName, get: ()=>cached, open: openModal };
+    }
 })();
 
 // Optional minimal style injection for highlight (only if not already present)

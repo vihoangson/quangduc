@@ -40,19 +40,36 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
 <script>
-// Fallback: only attach if main bundle not loaded yet
+// Ultra-simple final fallback binding (idempotent)
 (function(){
-    if (window.__replyHandlerInitialized) return;
-    window.__replyHandlerInitialized = true;
-    function autoResize(el){ el.style.height='auto'; el.style.overflow='hidden'; el.style.height=el.scrollHeight+'px'; }
-    document.addEventListener('click',function(e){
-        const r=e.target.closest('.btn-reply');
-        if(r){const sel=r.getAttribute('data-target');if(sel){const f=document.querySelector(sel);if(f){const open=!f.classList.contains('d-none');document.querySelectorAll('.reply-form').forEach(ff=>{if(ff!==f)ff.classList.add('d-none');}); if(open){f.classList.add('d-none');} else {f.classList.remove('d-none'); (f.querySelector('input[name=name]')||f.querySelector('textarea[name=message]'))?.focus();}}}return;}
-        const c=e.target.closest('.btn-cancel-reply');
-        if(c){const sel=c.getAttribute('data-target'); if(sel){const f=document.querySelector(sel); if(f) f.classList.add('d-none');}}
-    });
-    document.addEventListener('input',e=>{const ta=e.target.closest('textarea.auto-resize'); if(ta) autoResize(ta);});
-    document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('textarea.auto-resize').forEach(autoResize);});
+    if (!window.__toggleReply) {
+        window.__toggleReply = function(sel){
+            const form = document.querySelector(sel);
+            if(!form) return;
+            const open = !form.classList.contains('d-none');
+            document.querySelectorAll('.reply-form').forEach(f=>{ if(f!==form) f.classList.add('d-none'); });
+            if(open){ form.classList.add('d-none'); } else { form.classList.remove('d-none'); (form.querySelector('input[name="name"]')||form.querySelector('textarea[name="message"]'))?.focus(); }
+        };
+    }
+    if (window.__replyButtonsBound) return; window.__replyButtonsBound = true;
+    function bind(){
+        document.querySelectorAll('button.btn-reply').forEach(btn=>{
+            if (btn.dataset.bound) return; btn.dataset.bound='1';
+            btn.addEventListener('click', function(){
+                const sel = this.getAttribute('data-target') || this.getAttribute('data-reply-form');
+                if(!sel) return; window.__toggleReply(sel);
+            });
+        });
+        document.querySelectorAll('.btn-cancel-reply').forEach(btn=>{
+            if (btn.dataset.bound) return; btn.dataset.bound='1';
+            btn.addEventListener('click', function(){
+                const sel=this.getAttribute('data-target'); if(!sel) return; const form=document.querySelector(sel); if(form) form.classList.add('d-none');
+            });
+        });
+    }
+    bind();
+    const mo = new MutationObserver(()=>bind());
+    mo.observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
 </body>
