@@ -39,5 +39,21 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
+<script>
+// Fallback: only attach if main bundle not loaded yet
+(function(){
+    if (window.__replyHandlerInitialized) return;
+    window.__replyHandlerInitialized = true;
+    function autoResize(el){ el.style.height='auto'; el.style.overflow='hidden'; el.style.height=el.scrollHeight+'px'; }
+    document.addEventListener('click',function(e){
+        const r=e.target.closest('.btn-reply');
+        if(r){const sel=r.getAttribute('data-target');if(sel){const f=document.querySelector(sel);if(f){const open=!f.classList.contains('d-none');document.querySelectorAll('.reply-form').forEach(ff=>{if(ff!==f)ff.classList.add('d-none');}); if(open){f.classList.add('d-none');} else {f.classList.remove('d-none'); (f.querySelector('input[name=name]')||f.querySelector('textarea[name=message]'))?.focus();}}}return;}
+        const c=e.target.closest('.btn-cancel-reply');
+        if(c){const sel=c.getAttribute('data-target'); if(sel){const f=document.querySelector(sel); if(f) f.classList.add('d-none');}}
+    });
+    document.addEventListener('input',e=>{const ta=e.target.closest('textarea.auto-resize'); if(ta) autoResize(ta);});
+    document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('textarea.auto-resize').forEach(autoResize);});
+})();
+</script>
 </body>
 </html>
