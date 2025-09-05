@@ -26,7 +26,7 @@
                 <div class="mb-2">
                     <input required maxlength="80" name="name" placeholder="Tên của bạn" class="form-control form-control-sm" />
                 </div>
-                <div class="mb-2">
+                <div class="mb-2 d-none">
                     <input type="file" name="image" accept="image/*" class="form-control form-control-sm" />
                 </div>
                 <div class="mb-2">

@@ -25,6 +25,8 @@
         .badge { font-weight:500; }
         .pagination { --bs-pagination-border-radius: 8px; }
         .comment-bubble img, .comment-message img, .comment-upload-img {max-width:700px; width:100%; height:auto;}
+    </style>
+    @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
@@ -39,4 +41,3 @@
 @stack('scripts')
 </body>
 </html>
-
