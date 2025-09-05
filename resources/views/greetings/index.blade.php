@@ -31,7 +31,7 @@
                         <input type="text" name="name" class="form-control" maxlength="80" required value="{{ old('name') }}" placeholder="Tên của bạn">
                     </div>
                     {{-- Image upload input inserted here --}}
-                    <div class="mb-3">
+                    <div class="mb-3 d-none">
                         <label class="form-label">Ảnh (tuỳ chọn)</label>
                         <input type="file" name="image" id="image-input" accept="image/*" class="form-control">
                         <small class="text-muted">Ảnh > 1000px sẽ tự resize về 900px chiều ngang (GIF giữ nguyên).</small>
