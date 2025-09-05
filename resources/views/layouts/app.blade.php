@@ -24,7 +24,7 @@
         a { text-decoration:none; }
         .badge { font-weight:500; }
         .pagination { --bs-pagination-border-radius: 8px; }
-    </style>
+        .comment-bubble img, .comment-message img, .comment-upload-img {max-width:700px; width:100%; height:auto;}
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
