@@ -25,13 +25,51 @@
         .badge { font-weight:500; }
         .pagination { --bs-pagination-border-radius: 8px; }
         .comment-bubble img, .comment-message img, .comment-upload-img {max-width:700px; width:100%; height:auto;}
+        .nav-link.active { font-weight:600; }
     </style>
     @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-white shadow-sm mb-4">
+<nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm sticky-top">
     <div class="container">
         <a class="navbar-brand" href="{{ route('greetings.index') }}">Lời Chúc</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNavbar" aria-controls="primaryNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="primaryNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('greetings.index') ? 'active' : '' }}" href="{{ route('greetings.index') }}">Trang Chủ</a>
+                </li>
+            </ul>
+            <div class="d-flex align-items-center gap-2">
+                <button id="changeNameBtn" type="button" class="btn btn-outline-secondary btn-sm d-none">Đổi tên</button>
+                @if (Route::has('login'))
+                    @auth
+                        <div class="dropdown">
+                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ auth()->user()->name ?? 'Tài khoản' }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url('/home') }}">Bảng điều khiển</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}" class="px-3 py-1">
+                                        @csrf
+                                        <button type="submit" class="btn btn-link p-0 m-0 text-danger text-decoration-none">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    @else
+                        <a class="btn btn-outline-primary btn-sm" href="{{ route('login') }}">Đăng nhập</a>
+                        @if (Route::has('register'))
+                            <a class="btn btn-primary btn-sm" href="{{ route('register') }}">Đăng ký</a>
+                        @endif
+                    @endauth
+                @endif
+            </div>
+        </div>
     </div>
 </nav>
 <main class="container mb-5">
@@ -40,36 +78,19 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
 <script>
-// Ultra-simple final fallback binding (idempotent)
+// Fallback: only attach if main bundle not loaded yet
 (function(){
-    if (!window.__toggleReply) {
-        window.__toggleReply = function(sel){
-            const form = document.querySelector(sel);
-            if(!form) return;
-            const open = !form.classList.contains('d-none');
-            document.querySelectorAll('.reply-form').forEach(f=>{ if(f!==form) f.classList.add('d-none'); });
-            if(open){ form.classList.add('d-none'); } else { form.classList.remove('d-none'); (form.querySelector('input[name="name"]')||form.querySelector('textarea[name="message"]'))?.focus(); }
-        };
-    }
-    if (window.__replyButtonsBound) return; window.__replyButtonsBound = true;
-    function bind(){
-        document.querySelectorAll('button.btn-reply').forEach(btn=>{
-            if (btn.dataset.bound) return; btn.dataset.bound='1';
-            btn.addEventListener('click', function(){
-                const sel = this.getAttribute('data-target') || this.getAttribute('data-reply-form');
-                if(!sel) return; window.__toggleReply(sel);
-            });
-        });
-        document.querySelectorAll('.btn-cancel-reply').forEach(btn=>{
-            if (btn.dataset.bound) return; btn.dataset.bound='1';
-            btn.addEventListener('click', function(){
-                const sel=this.getAttribute('data-target'); if(!sel) return; const form=document.querySelector(sel); if(form) form.classList.add('d-none');
-            });
-        });
-    }
-    bind();
-    const mo = new MutationObserver(()=>bind());
-    mo.observe(document.documentElement,{childList:true,subtree:true});
+    if (window.__replyHandlerInitialized) return;
+    window.__replyHandlerInitialized = true;
+    function autoResize(el){ el.style.height='auto'; el.style.overflow='hidden'; el.style.height=el.scrollHeight+'px'; }
+    document.addEventListener('click',function(e){
+        const r=e.target.closest('.btn-reply');
+        if(r){const sel=r.getAttribute('data-target');if(sel){const f=document.querySelector(sel);if(f){const open=!f.classList.contains('d-none');document.querySelectorAll('.reply-form').forEach(ff=>{if(ff!==f)ff.classList.add('d-none');}); if(open){f.classList.add('d-none');} else {f.classList.remove('d-none'); (f.querySelector('input[name=name]')||f.querySelector('textarea[name=message]'))?.focus();}}}return;}
+        const c=e.target.closest('.btn-cancel-reply');
+        if(c){const sel=c.getAttribute('data-target'); if(sel){const f=document.querySelector(sel); if(f) f.classList.add('d-none');}}
+    });
+    document.addEventListener('input',e=>{const ta=e.target.closest('textarea.auto-resize'); if(ta) autoResize(ta);});
+    document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('textarea.auto-resize').forEach(autoResize);});
 })();
 </script>
 </body>

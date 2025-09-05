@@ -21,7 +21,9 @@
                 </ul>
             </div>
         @endif
-        <div class="card shadow-sm mb-4">
+        {{-- Local sub-navbar (secondary navigation) --}}
+
+        <div id="form-greeting" class="card shadow-sm mb-4">
             <div class="card-body">
                 <h5 class="card-title mb-3">Gửi Lời Chúc</h5>
                 <form id="greeting-form" method="post" action="{{ route('greetings.store') }}" enctype="multipart/form-data">
@@ -30,7 +32,7 @@
                         <label class="form-label">Tên</label>
                         <input type="text" name="name" class="form-control" maxlength="80" required value="{{ old('name') }}" placeholder="Tên của bạn">
                     </div>
-                    {{-- Image upload input inserted here --}}
+                    {{-- Image upload input (currently hidden) --}}
                     <div class="mb-3 d-none">
                         <label class="form-label">Ảnh (tuỳ chọn)</label>
                         <input type="file" name="image" id="image-input" accept="image/*" class="form-control">
@@ -55,7 +57,7 @@
                 </form>
             </div>
         </div>
-        <div class="mb-2 d-flex align-items-center gap-2">
+        <div id="list-greetings" class="mb-2 d-flex align-items-center gap-2">
             <h5 class="mb-0">Lời Chúc Mới Nhất</h5>
             @if(isset($greetings))<span class="badge text-bg-secondary">{{ $greetings->total() }}</span>@endif
         </div>
@@ -68,21 +70,30 @@
                 @endforelse
             @endif
         </div>
-        <div class="mt-4">
-        <div class="mt-4">
-        </div>
+        @if(isset($greetings))
+            <div class="mt-4">
+                {{ $greetings->links() }}
+            </div>
+        @endif
+    </div>
+</div>
 
 @push('scripts')
 <script>
 (function(){
-    function autoResize(el){ el.style.height='auto'; el.style.height=(el.scrollHeight)+'px'; }
-    document.querySelectorAll('textarea.auto-resize').forEach(t=>{ t.addEventListener('input',()=>autoResize(t)); autoResize(t); });
-    document.addEventListener('click', e=>{
-        if(e.target.classList.contains('btn-reply')){ const sel=e.target.dataset.target; const f=document.querySelector(sel); if(f){ f.classList.toggle('d-none'); if(!f.classList.contains('d-none')){ const i=f.querySelector('input[name=name]'); i&&i.focus(); } } }
-    function autoResize(el){ el.style.height='auto'; el.style.height=(el.scrollHeight)+'px'; }
-    document.querySelectorAll('textarea.auto-resize').forEach(t=>{ t.addEventListener('input',()=>autoResize(t)); autoResize(t); });
-    document.addEventListener('click', e=>{
+    // Secondary nav: open change name modal via existing button in layout
+    document.getElementById('openChangeNameViaSubNav')?.addEventListener('click',()=>{
+        document.getElementById('changeNameBtn')?.click();
+    });
 
+    // Auto-resize textareas
+    function autoResize(el){ el.style.height='auto'; el.style.overflow='hidden'; el.style.height = el.scrollHeight + 'px'; }
+    document.querySelectorAll('#form-greeting textarea.auto-resize').forEach(t=>{
+        t.addEventListener('input',()=>autoResize(t));
+        autoResize(t);
+    });
+
+    // Image preview (currently hidden block)
     const inputImage = document.getElementById('image-input');
     const previewWrap = document.getElementById('image-preview');
     const previewImg = previewWrap ? previewWrap.querySelector('img') : null;
@@ -91,21 +102,19 @@
 
     function clearImage(){ if(inputImage) inputImage.value=''; if(previewWrap) previewWrap.classList.add('d-none'); if(previewImg) previewImg.src='#'; }
 
-    if(inputImage){
-        inputImage.addEventListener('change',()=>{
-            if(inputImage.files && inputImage.files[0]){
-                const f = inputImage.files[0];
-                const url = URL.createObjectURL(f);
-                if(previewImg) previewImg.src = url;
-                previewWrap.classList.remove('d-none');
-            } else { clearImage(); }
-        });
-    }
-    if(removeBtn){ removeBtn.addEventListener('click', clearImage); }
-    if(form){ form.addEventListener('reset', clearImage); }
-
+    inputImage?.addEventListener('change', () => {
+        if (inputImage.files && inputImage.files[0]) {
+            const f = inputImage.files[0];
+            const url = URL.createObjectURL(f);
+            if(previewImg) previewImg.src = url;
+            previewWrap?.classList.remove('d-none');
+        } else {
+            clearImage();
+        }
+    });
+    removeBtn?.addEventListener('click', clearImage);
+    form?.addEventListener('reset', clearImage);
 })();
 </script>
 @endpush
-
-
+@endsection
