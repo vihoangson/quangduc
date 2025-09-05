@@ -53,7 +53,7 @@
                             Có thể xuống dòng để tách đoạn.
                         </div>
                     </div>
-                    <button class="btn btn-primary">Gửi</button>
+                    <button class="btn btn-primary"> Gửi</button>
                 </form>
             </div>
         </div>
