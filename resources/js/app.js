@@ -104,7 +104,10 @@ import './bootstrap';
                     inp.dataset.autofilled = '1';
                 }
             });
-            if (changeBtn) changeBtn.classList.remove('d-none');
+            if (changeBtn){
+                changeBtn.classList.remove('d-none');
+                changeBtn.textContent = name ? 'Đổi tên' : 'Đặt tên';
+            }
         }
 
         function openModal(){
@@ -125,7 +128,7 @@ import './bootstrap';
             return true;
         }
 
-        if (cached) applyName(cached);
+        if (cached) applyName(cached); else applyName('');
 
         // Focus interception
         document.addEventListener('focusin', (e)=>{
@@ -163,6 +166,7 @@ import './bootstrap';
             document.querySelectorAll('input[name="name"]').forEach(inp=>{
                 if (inp.dataset.autofilled==='1') { inp.value=''; }
             });
+            applyName('');
             openModal();
         });
         // Expose for debugging

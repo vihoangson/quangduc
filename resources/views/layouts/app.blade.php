@@ -72,25 +72,55 @@
         </div>
     </div>
 </nav>
+<!-- Guest Name Modal (restored) -->
+<div class="modal fade" id="guestNameModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tên hiển thị</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label small text-muted">Nhập tên (lưu trong trình duyệt).</label>
+          <input id="guestNameInput" type="text" maxlength="80" class="form-control" required>
+          <div class="invalid-feedback">Vui lòng nhập tên.</div>
+        </div>
+        <div class="d-flex justify-content-between">
+          <button id="clearSavedNameBtn" type="button" class="btn btn-outline-danger btn-sm">Xóa tên đã lưu</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
 <main class="container mb-5">
     @yield('content')
 </main>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @stack('scripts')
 <script>
-// Fallback: only attach if main bundle not loaded yet
+// Fallback guest name (only if main app.js logic not active)
 (function(){
-    if (window.__replyHandlerInitialized) return;
-    window.__replyHandlerInitialized = true;
-    function autoResize(el){ el.style.height='auto'; el.style.overflow='hidden'; el.style.height=el.scrollHeight+'px'; }
-    document.addEventListener('click',function(e){
-        const r=e.target.closest('.btn-reply');
-        if(r){const sel=r.getAttribute('data-target');if(sel){const f=document.querySelector(sel);if(f){const open=!f.classList.contains('d-none');document.querySelectorAll('.reply-form').forEach(ff=>{if(ff!==f)ff.classList.add('d-none');}); if(open){f.classList.add('d-none');} else {f.classList.remove('d-none'); (f.querySelector('input[name=name]')||f.querySelector('textarea[name=message]'))?.focus();}}}return;}
-        const c=e.target.closest('.btn-cancel-reply');
-        if(c){const sel=c.getAttribute('data-target'); if(sel){const f=document.querySelector(sel); if(f) f.classList.add('d-none');}}
-    });
-    document.addEventListener('input',e=>{const ta=e.target.closest('textarea.auto-resize'); if(ta) autoResize(ta);});
-    document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('textarea.auto-resize').forEach(autoResize);});
+  if (window.__guestName || window.__guestNameFallbackInit) return; window.__guestNameFallbackInit = true;
+  const KEY='guestName';
+  const btn=document.getElementById('changeNameBtn');
+  const modalEl=document.getElementById('guestNameModal');
+  const inputEl=document.getElementById('guestNameInput');
+  const clearBtn=document.getElementById('clearSavedNameBtn');
+  let cached=localStorage.getItem(KEY)||'';
+  function setBtnLabel(){ if(btn) btn.textContent = cached? 'Đổi tên':'Đặt tên'; }
+  function apply(){document.querySelectorAll('input[name="name"]').forEach(i=>{if(!i.value||i.dataset.autofilled==='1'||i.value===cached){i.value=cached;i.dataset.autofilled='1';}});setBtnLabel();}
+  function open(){ if(!modalEl) return; const inst=bootstrap.Modal.getOrCreateInstance(modalEl); if(inputEl){inputEl.value=cached; setTimeout(()=>inputEl.focus(),60);} inst.show(); }
+  function save(v){cached=v.trim(); if(!cached) return false; localStorage.setItem(KEY,cached); apply(); return true; }
+  function clear(){localStorage.removeItem(KEY); cached=''; document.querySelectorAll('input[name="name"]').forEach(i=>{ if(i.dataset.autofilled==='1') i.value='';}); apply(); }
+  apply();
+  btn?.addEventListener('click',()=>open());
+  clearBtn?.addEventListener('click',()=>{clear(); open();});
+  modalEl?.querySelector('form')?.addEventListener('submit',e=>{e.preventDefault(); const v=(inputEl?.value||'').trim(); if(!v){inputEl.classList.add('is-invalid'); return;} inputEl.classList.remove('is-invalid'); if(save(v)) bootstrap.Modal.getInstance(modalEl).hide();});
+  document.addEventListener('focusin',e=>{ if(e.target.matches('input[name="name"]') && !cached){ e.target.blur(); open(); }});
 })();
 </script>
 </body>
