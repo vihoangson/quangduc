@@ -60,4 +60,15 @@ class Greeting extends Model
     {
         return $this->image_path ? asset('storage/' . $this->image_path) : null;
     }
+
+    public function getShortNameAttribute(): string
+    {
+        $displayName = (string) $this->name;
+        $len = mb_strlen($displayName, 'UTF-8');
+        // Rule: if longer than 10 chars, keep first 7 + ... + last 2
+        if ($len > 10) {
+            $displayName = mb_substr($displayName, 0, 7, 'UTF-8') . '...' . mb_substr($displayName, -2, null, 'UTF-8');
+        }
+        return $displayName;
+    }
 }

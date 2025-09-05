@@ -6,11 +6,11 @@
         <div class="flex-grow-1">
             <div class="comment-bubble">
                 <div class="d-flex align-items-center gap-2 mb-1">
-                    <strong class="me-auto">{{ $greeting->name }}</strong>
+                    <strong class="me-auto" title="{{ $greeting->name }}">{{ $greeting->short_name }}</strong>
                     <span class="comment-meta"><time datetime="{{ $greeting->created_at }}" title="{{ $greeting->created_at }}">{{ $greeting->created_at->diffForHumans() }}</time></span>
                 </div>
                 @if($greeting->image_url)
-                    <div class="mb- ">
+                    <div class="mb-2">
                         <img src="{{ $greeting->image_url }}" alt="uploaded image" class="img-fluid rounded border" loading="lazy">
                     </div>
                 @endif
