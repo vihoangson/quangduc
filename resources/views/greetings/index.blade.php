@@ -46,7 +46,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Lời chúc</label>
-                        <textarea name="message" class="form-control auto-resize" rows="3" maxlength="4000" required placeholder="Viết lời chúc... (YouTube: dán link; Ảnh: !https://...jpg!)">{{ old('message') }}</textarea>
+                        <textarea name="message" class="form-control auto-resize" rows="3" maxlength="4000" required placeholder="Viết message... (YouTube: dán link; Ảnh: !https://...jpg!)">{{ old('message') }}</textarea>
                         <div class="form-text">
                             YouTube: dán link (https://youtu.be/ID hoặc https://www.youtube.com/watch?v=ID).<br>
                             Ảnh: cú pháp <code>!https://domain/ten-anh.jpg!</code> (jpg, jpeg, png, gif, webp, svg).<br>

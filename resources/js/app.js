@@ -10,12 +10,17 @@ import './bootstrap';
                 }
             }
         });
+        // Reset aria-expanded on all reply buttons when hiding others
+        document.querySelectorAll('.btn-reply[aria-expanded="true"]').forEach(btn=>btn.setAttribute('aria-expanded','false'));
     }
 
     function showReplyForm(form) {
         if (!form) return;
         hideAllReplyForms(form.id);
         form.classList.remove('d-none');
+        // Set aria-expanded for the triggering button
+        const btn = document.querySelector('.btn-reply[data-target="#'+form.id+'"], .btn-reply[data-reply-form="#'+form.id+'"]');
+        if (btn) btn.setAttribute('aria-expanded','true');
         // Focus first non-hidden input (prefer name, else message)
         const nameInput = form.querySelector('input[name="name"]');
         const messageArea = form.querySelector('textarea[name="message"]');
@@ -32,15 +37,17 @@ import './bootstrap';
     document.addEventListener('click', (e) => {
         const replyBtn = e.target.closest('.btn-reply');
         if (replyBtn) {
-            const targetSel = replyBtn.getAttribute('data-target');
+            const targetSel = replyBtn.getAttribute('data-target') || replyBtn.getAttribute('data-reply-form');
             if (targetSel) {
                 const form = document.querySelector(targetSel);
                 if (form) {
                     const isOpen = !form.classList.contains('d-none');
                     if (isOpen) {
                         form.classList.add('d-none');
+                        replyBtn.setAttribute('aria-expanded','false');
                     } else {
                         showReplyForm(form);
+                        replyBtn.setAttribute('aria-expanded','true');
                     }
                 }
             }
@@ -51,7 +58,12 @@ import './bootstrap';
             const targetSel = cancelBtn.getAttribute('data-target');
             if (targetSel) {
                 const form = document.querySelector(targetSel);
-                if (form) form.classList.add('d-none');
+                if (form) {
+                    form.classList.add('d-none');
+                    // Reset aria-expanded on its button
+                    const btn = document.querySelector('.btn-reply[data-target="'+targetSel+'"], .btn-reply[data-reply-form="'+targetSel+'"]');
+                    if (btn) btn.setAttribute('aria-expanded','false');
+                }
             }
             return;
         }

@@ -16,7 +16,7 @@
                 @endif
                 <div class="comment-message small">{!! $greeting->rendered_message !!}</div>
                 <div class="comment-actions mt-2 d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-light text-primary fw-semibold btn-reply" data-target="#reply-form-{{ $greeting->id }}" data-reply-form="#reply-form-{{ $greeting->id }}" aria-controls="reply-form-{{ $greeting->id }}" onclick="(function(b){var s=b.getAttribute('data-target')||b.getAttribute('data-reply-form');if(!s)return;var f=document.querySelector(s);if(!f)return;var o=!f.classList.contains('d-none');document.querySelectorAll('.reply-form').forEach(function(ff){if(ff!==f)ff.classList.add('d-none');});if(o){f.classList.add('d-none');}else{f.classList.remove('d-none');var inp=f.querySelector('input[name=name]')||f.querySelector('textarea[name=message]');if(inp)inp.focus();}})(this)">Trả lời</button>
+                    <button type="button" class="btn btn-sm btn-outline-light text-primary fw-semibold btn-reply" data-target="#reply-form-{{ $greeting->id }}" data-reply-form="#reply-form-{{ $greeting->id }}" aria-controls="reply-form-{{ $greeting->id }}" aria-expanded="false">Trả lời</button>
                     <a class="btn btn-sm btn-outline-light" href="#greeting-{{ $greeting->id }}">Liên kết</a>
                 </div>
             </div>
